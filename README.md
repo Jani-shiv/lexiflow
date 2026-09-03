@@ -369,12 +369,8 @@ Dual-licensed under:
 
 <br/>
 
-```
-  ┌───────────────────────────────────────────────────────────────┐
-  │  ARCHITECTED & ENGINEERED BY                                  │
-  │  SHIV JANI                                                    │
-  │  https://github.com/Jani-shiv                                 │
-  └───────────────────────────────────────────────────────────────┘
-```
+[![Architected & Engineered by Shiv Jani](https://img.shields.io/badge/ARCHITECTED%20%26%20ENGINEERED%20BY-SHIV%20JANI-F5B041?style=for-the-badge&logo=rust&logoColor=black&labelColor=181825)](https://github.com/Jani-shiv)
+&nbsp;
+[![Follow Shiv Jani on GitHub](https://img.shields.io/badge/FOLLOW%20ON%20GITHUB-%40Jani--shiv-F4D03F?style=for-the-badge&logo=github&logoColor=181825&labelColor=181825)](https://github.com/Jani-shiv)
 
 </div>
