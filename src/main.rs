@@ -2,6 +2,7 @@ use lexiflow::benchmark::{LatencyBenchmark, MemoryBenchmarkReport};
 use lexiflow::config::AppConfig;
 use lexiflow::grammar::GrammarEngine;
 use lexiflow::logging::{init_logger, log_info};
+#[cfg(target_os = "windows")]
 use lexiflow::platform::windows::{start_keyboard_hook, KeyboardHookState, WindowsStartup};
 use lexiflow::replacement::InjectionGuard;
 use lexiflow::scheduler::DebounceScheduler;
@@ -65,7 +66,7 @@ fn main() {
         println!("  LEXIFLOW INTERACTIVE TEST MODE");
         println!("  Type any sentence and press Enter to see corrections.");
         println!("  Type 'exit' or 'quit' to exit.");
-        println!("=======================================================\n");
+        println!("=======================================================");
 
         let engine = GrammarEngine::new();
         let stdin = io::stdin();
@@ -111,6 +112,7 @@ fn main() {
     // 5. Autostart management
     if let Some(pos) = args.iter().position(|a| a == "--autostart") {
         let sub_cmd = args.get(pos + 1).map(|s| s.as_str()).unwrap_or("status");
+        #[cfg(target_os = "windows")]
         match sub_cmd {
             "enable" => match WindowsStartup::configure_autostart(true) {
                 Ok(_) => println!("Autostart successfully enabled in Windows Startup."),
@@ -125,6 +127,10 @@ fn main() {
                 println!("Autostart status: {}", if enabled { "Enabled" } else { "Disabled" });
             }
             _ => eprintln!("Unknown autostart command: {}. Use 'enable', 'disable', or 'status'.", sub_cmd),
+        }
+        #[cfg(not(target_os = "windows"))]
+        {
+            println!("Autostart is supported natively on Windows (sub-command: {}).", sub_cmd);
         }
         return;
     }
@@ -231,18 +237,30 @@ fn main() {
         }
     });
 
-    // Start Windows Global Keyboard Hook
-    let hook_state = KeyboardHookState {
-        buffer,
-        scheduler,
-        suggestions,
-        security,
-        injection_guard,
-    };
+    #[cfg(target_os = "windows")]
+    {
+        // Start Windows Global Keyboard Hook
+        let hook_state = KeyboardHookState {
+            buffer,
+            scheduler,
+            suggestions,
+            security,
+            injection_guard,
+        };
 
-    println!("LexiFlow suggestion engine running. Press Ctrl+C to terminate.");
-    if let Err(e) = start_keyboard_hook(hook_state) {
-        lexiflow::logging::log_error("hook_failed", &[("error", &e)]);
-        eprintln!("Error starting keyboard hook: {}", e);
+        println!("LexiFlow suggestion engine running. Press Ctrl+C to terminate.");
+        if let Err(e) = start_keyboard_hook(hook_state) {
+            lexiflow::logging::log_error("hook_failed", &[("error", &e)]);
+            eprintln!("Error starting keyboard hook: {}", e);
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        println!("LexiFlow background daemon initialized (headless / non-Windows platform).");
+        println!("Press Ctrl+C to terminate.");
+        loop {
+            std::thread::sleep(Duration::from_secs(3600));
+        }
     }
 }
