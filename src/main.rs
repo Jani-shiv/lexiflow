@@ -232,7 +232,7 @@ fn main() {
                     }
                 }
             } else {
-                std::thread::sleep(Duration::from_millis(10));
+                std::thread::sleep(Duration::from_millis(1));
             }
         }
     });

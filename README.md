@@ -267,8 +267,8 @@ enabled = true
 # Language localization
 language = "en"
 
-# Debounce window in milliseconds
-debounce_ms = 250
+# Debounce window in milliseconds (0 for instant zero-pause evaluation)
+debounce_ms = 0
 
 # Minimum confidence threshold (0.0 to 1.0)
 confidence_threshold = 0.85

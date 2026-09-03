@@ -43,7 +43,7 @@ fn default_language() -> String {
 }
 
 fn default_debounce_ms() -> u64 {
-    250
+    0
 }
 
 fn default_confidence_threshold() -> f32 {
@@ -146,7 +146,7 @@ mod tests {
     fn test_default_config() {
         let cfg = AppConfig::default();
         assert!(cfg.enabled);
-        assert_eq!(cfg.debounce_ms, 250);
+        assert_eq!(cfg.debounce_ms, 0);
         assert_eq!(cfg.confidence_threshold, 0.85);
         assert!(cfg.excluded_applications.contains(&"1password.exe".to_string()));
     }
