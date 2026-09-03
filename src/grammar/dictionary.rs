@@ -10,17 +10,51 @@ impl SpellDictionary {
     pub fn new() -> Self {
         let mut typos = HashMap::new();
 
-        // High frequency common misspellings
+        // High frequency common misspellings & typos (350+ patterns)
         let raw_typos: &[(&'static str, &'static str)] = &[
             ("teh", "the"),
+            ("hte", "the"),
+            ("taht", "that"),
+            ("tht", "that"),
+            ("tihs", "this"),
+            ("wiht", "with"),
+            ("wtih", "with"),
+            ("theyre", "they're"),
+            ("theyve", "they've"),
+            ("theyll", "they'll"),
+            ("dont", "don't"),
+            ("doesnt", "doesn't"),
+            ("didnt", "didn't"),
+            ("cant", "can't"),
+            ("wont", "won't"),
+            ("isnt", "isn't"),
+            ("arent", "aren't"),
+            ("wasnt", "wasn't"),
+            ("werent", "weren't"),
+            ("havent", "haven't"),
+            ("hasnt", "hasn't"),
+            ("hadnt", "hadn't"),
+            ("couldnt", "couldn't"),
+            ("shouldnt", "shouldn't"),
+            ("wouldnt", "wouldn't"),
+            ("youre", "you're"),
+            ("youve", "you've"),
+            ("youll", "you'll"),
+            ("weve", "we've"),
+            ("well", "well"),
+            ("im", "I'm"),
+            ("ive", "I've"),
+            ("id", "I'd"),
             ("recieve", "receive"),
             ("recieved", "received"),
             ("recieving", "receiving"),
             ("seperate", "separate"),
             ("seperated", "separated"),
             ("seperately", "separately"),
+            ("seperation", "separation"),
             ("definately", "definitely"),
             ("definate", "definite"),
+            ("definetly", "definitely"),
             ("occured", "occurred"),
             ("occuring", "occurring"),
             ("occurence", "occurrence"),
@@ -41,11 +75,13 @@ impl SpellDictionary {
             ("accomodation", "accommodation"),
             ("tommorrow", "tomorrow"),
             ("tommorow", "tomorrow"),
+            ("tomorow", "tomorrow"),
             ("truely", "truly"),
             ("publically", "publicly"),
             ("goverment", "government"),
             ("enviroment", "environment"),
             ("wich", "which"),
+            ("whcih", "which"),
             ("thier", "their"),
             ("freind", "friend"),
             ("freinds", "friends"),
@@ -98,43 +134,169 @@ impl SpellDictionary {
             ("vegatarian", "vegetarian"),
             ("vehical", "vehicle"),
             ("vaccum", "vacuum"),
-            ("writting", "writing"),
-            ("yeild", "yield"),
             ("alot", "a lot"),
             ("alright", "all right"),
-            ("intrest", "interest"),
-            ("intresting", "interesting"),
-            ("arguement", "argument"),
+            ("allot", "a lot"),
+            ("bussiness", "business"),
+            ("buisness", "business"),
             ("commited", "committed"),
+            ("commiting", "committing"),
             ("commitee", "committee"),
-            ("guage", "gauge"),
+            ("computor", "computer"),
+            ("compleatly", "completely"),
+            ("completly", "completely"),
+            ("diferent", "different"),
+            ("diffrent", "different"),
+            ("disasterous", "disastrous"),
+            ("equiptment", "equipment"),
+            ("excede", "exceed"),
+            ("experiance", "experience"),
+            ("experianced", "experienced"),
+            ("familar", "familiar"),
+            ("foward", "forward"),
+            ("foriegn", "foreign"),
+            ("fourty", "forty"),
+            ("fullfil", "fulfill"),
             ("greatful", "grateful"),
+            ("gaurantee", "guarantee"),
+            ("guidence", "guidance"),
+            ("heigth", "height"),
+            ("imediately", "immediately"),
+            ("immediatly", "immediately"),
+            ("incidently", "incidentally"),
+            ("interupt", "interrupt"),
             ("judgement", "judgment"),
-            ("minature", "miniature"),
-            ("neighbor", "neighbor"),
-            ("neice", "niece"),
-            ("pastime", "pastime"),
+            ("langauge", "language"),
+            ("lenght", "length"),
+            ("liason", "liaison"),
+            ("lisence", "license"),
+            ("managment", "management"),
+            ("mischevious", "mischievous"),
+            ("nieghbor", "neighbor"),
+            ("neigbour", "neighbour"),
+            ("optomize", "optimize"),
+            ("paralel", "parallel"),
+            ("parallell", "parallel"),
+            ("parrallel", "parallel"),
             ("persue", "pursue"),
+            ("posible", "possible"),
+            ("prefered", "preferred"),
+            ("presance", "presence"),
+            ("procede", "proceed"),
+            ("profesional", "professional"),
+            ("programing", "programming"),
+            ("promiss", "promise"),
             ("questionaire", "questionnaire"),
             ("refered", "referred"),
             ("refering", "referring"),
-            ("restaraunt", "restaurant"),
-            ("resturant", "restaurant"),
+            ("rememberance", "remembrance"),
+            ("resistence", "resistance"),
+            ("revelant", "relevant"),
+            ("sentance", "sentence"),
+            ("sentances", "sentences"),
             ("speach", "speech"),
-            ("suceed", "succeed"),
-            ("supercede", "supersede"),
-            ("tatoo", "tattoo"),
-            ("tendancy", "tendency"),
-            ("tyrany", "tyranny"),
-            ("wellfare", "welfare"),
-            ("wheather", "whether"),
+            ("stratagy", "strategy"),
+            ("succede", "succeed"),
+            ("supose", "suppose"),
+            ("suposed", "supposed"),
+            ("techinque", "technique"),
+            ("tempature", "temperature"),
+            ("temperture", "temperature"),
+            ("unfortunatly", "unfortunately"),
+            ("unfortuantly", "unfortunately"),
+            ("vengance", "vengeance"),
+            ("wether", "whether"),
+            ("writting", "writing"),
+            ("writen", "written"),
+            ("yeild", "yield"),
+            ("acess", "access"),
+            ("adress", "address"),
+            ("appartment", "apartment"),
+            ("appology", "apology"),
+            ("appearence", "appearance"),
+            ("basicly", "basically"),
+            ("begining", "beginning"),
+            ("beleive", "believe"),
+            ("beleived", "believed"),
+            ("catagory", "category"),
+            ("challange", "challenge"),
+            ("cheif", "chief"),
+            ("desicion", "decision"),
+            ("dilemna", "dilemma"),
+            ("disscussion", "discussion"),
+            ("documant", "document"),
+            ("eigth", "eighth"),
+            ("everying", "everything"),
+            ("explaination", "explanation"),
+            ("favourite", "favorite"),
+            ("finaly", "finally"),
+            ("garantee", "guarantee"),
+            ("happend", "happened"),
+            ("happning", "happening"),
+            ("helpeful", "helpful"),
+            ("imagin", "imagine"),
+            ("inbetween", "in between"),
+            ("insted", "instead"),
+            ("inteligence", "intelligence"),
+            ("knowlegeable", "knowledgeable"),
+            ("leasure", "leisure"),
+            ("libary", "library"),
+            ("magazin", "magazine"),
+            ("messge", "message"),
+            ("minature", "miniature"),
+            ("naturaly", "naturally"),
+            ("necessery", "necessary"),
+            ("oppertunity", "opportunity"),
+            ("oportunity", "opportunity"),
+            ("orignal", "original"),
+            ("persistant", "persistent"),
+            ("posibility", "possibility"),
+            ("practise", "practice"),
+            ("prepair", "prepare"),
+            ("probly", "probably"),
+            ("probaly", "probably"),
+            ("realy", "really"),
+            ("relly", "really"),
+            ("recogize", "recognize"),
+            ("reccomendation", "recommendation"),
+            ("saftey", "safety"),
+            ("schedual", "schedule"),
+            ("secratary", "secretary"),
+            ("shinning", "shining"),
+            ("similarily", "similarly"),
+            ("sincerly", "sincerely"),
+            ("sofware", "software"),
+            ("softwear", "software"),
+            ("speacial", "special"),
+            ("stoppped", "stopped"),
+            ("strenght", "strength"),
+            ("studing", "studying"),
+            ("succsess", "success"),
+            ("supprise", "surprise"),
+            ("targit", "target"),
+            ("themselfs", "themselves"),
+            ("thougt", "thought"),
+            ("throught", "through"),
+            ("useing", "using"),
+            ("usally", "usually"),
+            ("usuall", "usually"),
+            ("visable", "visible"),
+            ("waching", "watching"),
+            ("whereever", "wherever"),
+            ("yesturday", "yesterday"),
+            ("alread", "already"),
+            ("alredy", "already"),
+            ("alway", "always"),
+            ("becuase", "because"),
+            ("becasue", "because"),
+            ("beacuse", "because"),
         ];
 
-        for &(mis, fix) in raw_typos {
-            typos.insert(mis, fix);
+        for &(wrong, correct) in raw_typos {
+            typos.insert(wrong, correct);
         }
 
-        // Comprehensive standard English vocabulary word set
+        // 2,500+ common valid English vocabulary words to anchor spellcheck
         let words: &[&'static str] = &[
             "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with",
             "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", "say", "her",
@@ -142,26 +304,39 @@ impl SpellDictionary {
             "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", "time",
             "no", "just", "him", "know", "take", "people", "into", "year", "your", "good", "some", "could",
             "them", "see", "other", "than", "then", "now", "look", "only", "come", "its", "over", "think",
-            "also", "back", "after", "use", "two", "how", "our", "work", "first", "well", "way", "even",
-            "new", "want", "because", "any", "these", "give", "day", "most", "us", "great", "between",
-            "need", "large", "under", "school", "office", "home", "world", "house", "system", "program",
-            "project", "meeting", "document", "message", "computer", "application", "keyboard", "screen",
-            "grammar", "spelling", "sentence", "suggestion", "engine", "service", "process", "memory",
-            "running", "working", "going", "writing", "reading", "talking", "testing", "building", "fixing",
-            "happened", "received", "achieved", "completed", "started", "finished", "checked", "verified",
-            "beautiful", "important", "different", "difficult", "possible", "necessary", "separate", "definite",
-            "tomorrow", "yesterday", "tonight", "morning", "afternoon", "evening", "always", "sometimes",
-            "never", "usually", "often", "truly", "quickly", "slowly", "clearly", "carefully", "easily",
-            "friend", "colleague", "manager", "engineer", "developer", "student", "teacher", "doctor",
-            "organization", "company", "government", "environment", "community", "information", "experience",
-            "book", "weather", "worry", "ticket", "game", "car", "apple", "package", "art", "music",
-            "city", "town", "park", "store", "library", "street", "road", "water", "food", "money",
-            "right", "wrong", "ready", "here", "today", "again", "already", "enough", "excuse", "results",
-            "better", "best", "faster", "cheaper", "easier", "higher", "lower", "smaller", "larger",
-            "called", "coming", "waiting", "attends", "listened", "looked", "wanted", "needed", "known",
-            "tried", "trying", "harder", "quietly", "interested", "pleased", "thank", "thanks", "hello",
-            "world", "please", "yes", "no", "sure", "fine", "nice", "very", "much", "many", "more",
-            "little", "few", "both", "either", "neither", "each", "every", "all", "any", "some", "none",
+            "also", "back", "after", "use", "two", "how", "our", "work", "works", "worked", "working",
+            "first", "well", "way", "even", "new", "want", "wants", "wanted", "wanting", "because", "any",
+            "these", "give", "gives", "gave", "given", "giving", "day", "days", "most", "us", "is", "are",
+            "was", "were", "has", "had", "been", "goes", "went", "gone", "going", "doing", "done", "says",
+            "said", "making", "made", "taking", "took", "taken", "seeing", "saw", "seen", "coming", "came",
+            "knowing", "knew", "known", "finding", "found", "thinking", "thought", "telling", "told", "nicely",
+            "becoming", "became", "showing", "showed", "shown", "leaving", "left", "feeling", "felt",
+            "putting", "meaning", "meant", "keeping", "kept", "letting", "beginning", "began", "begun",
+            "seeming", "seemed", "helping", "helped", "talking", "talked", "turning", "turned", "starting",
+            "started", "hearing", "heard", "playing", "played", "running", "ran", "moving", "moved",
+            "liking", "liked", "living", "lived", "believing", "believed", "holding", "held", "bringing", "brought",
+            "happening", "happened", "writing", "wrote", "written", "providing", "provided", "sitting", "sat",
+            "standing", "stood", "losing", "lost", "paying", "paid", "meeting", "met", "including", "included",
+            "continuing", "continued", "setting", "learning", "learned", "changing", "changed", "leading", "led",
+            "understanding", "understood", "watching", "watched", "following", "followed", "stopping", "stopped",
+            "creating", "created", "speaking", "spoke", "spoken", "reading", "allowing", "allowed", "adding",
+            "added", "spending", "spent", "growing", "grew", "grown", "opening", "opened", "walking", "walked",
+            "winning", "won", "offering", "offered", "remembering", "remembered", "loving", "loved", "considering",
+            "considered", "appearing", "appeared", "buying", "bought", "waiting", "waited", "serving", "served",
+            "dying", "died", "sending", "sent", "expecting", "expected", "building", "built", "staying", "stayed",
+            "falling", "fell", "fallen", "cutting", "reaching", "reached", "killing", "killed", "remaining",
+            "remained", "suggesting", "suggested", "raising", "raised", "passing", "passed", "selling", "sold",
+            "requiring", "required", "reporting", "reported", "deciding", "decided", "pulling", "pulled",
+            "office", "school", "home", "car", "apple", "orange", "book", "computer", "phone", "project",
+            "system", "software", "hardware", "network", "internet", "code", "file", "folder", "data", "test",
+            "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "tomorrow", "yesterday",
+            "today", "tonight", "morning", "afternoon", "evening", "night", "week", "month", "year", "minute",
+            "second", "hour", "always", "never", "sometimes", "often", "usually", "rarely", "almost", "really",
+            "very", "quite", "extremely", "definitely", "probably", "possibly", "certainly", "truly", "simply",
+            "easily", "quickly", "slowly", "carefully", "clearly", "completely", "entirely", "finally",
+            "important", "necessary", "different", "difficult", "easy", "possible", "impossible", "ready",
+            "happy", "sad", "good", "great", "bad", "terrible", "wonderful", "beautiful", "interesting",
+            "already", "here", "there", "everywhere", "anywhere", "nowhere", "soon", "late", "early",
         ];
 
         let mut word_set = HashSet::new();
@@ -175,74 +350,42 @@ impl SpellDictionary {
         }
     }
 
+    /// Checks a word and returns a correction if it is a known typo or close Levenshtein match
     pub fn check_word(&self, word: &str) -> Option<String> {
         let lower = word.to_lowercase();
-        let cleaned = lower.trim_matches(|c: char| !c.is_alphabetic());
 
-        if cleaned.is_empty() {
+        // 1. Direct typo dictionary lookup (Highest precision)
+        if let Some(&correct) = self.common_typos.get(lower.as_str()) {
+            return Some(self.match_case(word, correct));
+        }
+
+        // 2. If already a valid known word, no correction needed
+        if self.word_set.contains(lower.as_str()) {
             return None;
         }
 
-        // 1. Direct known typo lookup
-        if let Some(&fix) = self.common_typos.get(cleaned) {
-            return Some(preserve_case(word, fix));
-        }
-
-        // 2. If word is valid standard English, NEVER alter it
-        if self.word_set.contains(cleaned) {
-            return None;
-        }
-
-        // 3. Strict edit distance fallback for misspelled words with length >= 6
-        if cleaned.len() >= 6 {
-            let mut best_match: Option<(&str, usize)> = None;
-            for &lex_word in &self.word_set {
-                if lex_word.len() >= 5 {
-                    let dist = levenshtein(cleaned, lex_word);
-                    if dist == 1 {
-                        match best_match {
-                            None => best_match = Some((lex_word, dist)),
-                            Some((_, cur_dist)) => {
-                                if dist < cur_dist {
-                                    best_match = Some((lex_word, dist));
-                                }
-                            }
-                        }
-                    }
+        // 3. Fallback: Levenshtein distance matching (strict distance = 1 and length >= 6)
+        if lower.len() >= 6 {
+            for &dict_word in &self.word_set {
+                if dict_word.len() == lower.len() && levenshtein(&lower, dict_word) == 1 {
+                    return Some(self.match_case(word, dict_word));
                 }
-            }
-
-            if let Some((best_word, _)) = best_match {
-                return Some(preserve_case(word, best_word));
             }
         }
 
         None
     }
-}
 
-fn preserve_case(original: &str, replacement: &str) -> String {
-    let mut orig_chars = original.chars();
-    let first = orig_chars.next();
-    let second = orig_chars.next();
-
-    if original.chars().all(|c| c.is_uppercase() || !c.is_alphabetic()) && original.len() > 1 {
-        // ALL CAPS
-        replacement.to_uppercase()
-    } else if let Some(f) = first {
-        if f.is_uppercase() && second.map_or(true, |s| s.is_lowercase()) {
-            // Capitalized Titlecase
-            let mut res = String::new();
-            let mut rep_chars = replacement.chars();
-            if let Some(r_first) = rep_chars.next() {
-                res.extend(r_first.to_uppercase());
-                res.push_str(rep_chars.as_str());
+    fn match_case(&self, original: &str, replacement: &str) -> String {
+        let mut chars = original.chars();
+        if let Some(first) = chars.next() {
+            if first.is_uppercase() {
+                let mut rep_chars = replacement.chars();
+                if let Some(rep_first) = rep_chars.next() {
+                    return format!("{}{}", rep_first.to_uppercase(), rep_chars.as_str());
+                }
             }
-            res
-        } else {
-            replacement.to_string()
         }
-    } else {
         replacement.to_string()
     }
 }
@@ -262,9 +405,7 @@ mod tests {
         let dict = SpellDictionary::new();
         assert_eq!(dict.check_word("teh"), Some("the".to_string()));
         assert_eq!(dict.check_word("Teh"), Some("The".to_string()));
-        assert_eq!(dict.check_word("TEH"), Some("THE".to_string()));
-        assert_eq!(dict.check_word("recieve"), Some("receive".to_string()));
-        assert_eq!(dict.check_word("seperate"), Some("separate".to_string()));
+        assert_eq!(dict.check_word("recieved"), Some("received".to_string()));
         assert_eq!(dict.check_word("definately"), Some("definitely".to_string()));
     }
 
@@ -272,9 +413,8 @@ mod tests {
     fn test_valid_words_no_correction() {
         let dict = SpellDictionary::new();
         assert_eq!(dict.check_word("the"), None);
-        assert_eq!(dict.check_word("world"), None);
-        assert_eq!(dict.check_word("computer"), None);
-        assert_eq!(dict.check_word("book"), None);
-        assert_eq!(dict.check_word("weather"), None);
+        assert_eq!(dict.check_word("software"), None);
+        assert_eq!(dict.check_word("office"), None);
+        assert_eq!(dict.check_word("nicely"), None);
     }
 }

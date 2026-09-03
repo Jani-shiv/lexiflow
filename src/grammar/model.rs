@@ -35,7 +35,7 @@ impl GrammarEngine {
             return Vec::new();
         }
 
-        let mut candidates = Vec::new();
+        let mut raw_candidates = Vec::new();
 
         // 1. Run deterministic grammar rules
         let rule_matches = self.rules.evaluate(text);
@@ -46,7 +46,7 @@ impl GrammarEngine {
                 conf = (conf + 0.02).min(0.99);
             }
 
-            candidates.push(GrammarSuggestionCandidate {
+            raw_candidates.push(GrammarSuggestionCandidate {
                 original_text: text[m.start..m.end].to_string(),
                 corrected_text: m.replacement,
                 start_offset: m.start,
@@ -60,73 +60,89 @@ impl GrammarEngine {
         // 2. Run spell checking on individual word tokens
         let mut byte_idx = 0;
         for word in text.split_whitespace() {
-            // Find word offset in text
             if let Some(pos) = text[byte_idx..].find(word) {
                 let actual_start = byte_idx + pos;
                 let actual_end = actual_start + word.len();
                 byte_idx = actual_end;
 
-                // Strip leading/trailing punctuation for check
                 let cleaned = word.trim_matches(|c: char| !c.is_alphabetic());
                 if !cleaned.is_empty() {
                     if let Some(fixed_word) = self.dictionary.check_word(cleaned) {
-                        // Reconstruct word with punctuation
                         let full_fix = word.replace(cleaned, &fixed_word);
                         if full_fix != word {
-                            // Check if this span is already covered by a higher priority rule
-                            let already_covered = candidates.iter().any(|c| {
-                                !(actual_end <= c.start_offset || actual_start >= c.end_offset)
+                            raw_candidates.push(GrammarSuggestionCandidate {
+                                original_text: word.to_string(),
+                                corrected_text: full_fix,
+                                start_offset: actual_start,
+                                end_offset: actual_end,
+                                confidence: 0.95,
+                                category: RuleCategory::Spelling,
+                                explanation: format!("Corrected spelling of '{}' to '{}'", word, fixed_word),
                             });
-
-                            if !already_covered {
-                                candidates.push(GrammarSuggestionCandidate {
-                                    original_text: word.to_string(),
-                                    corrected_text: full_fix,
-                                    start_offset: actual_start,
-                                    end_offset: actual_end,
-                                    confidence: 0.95,
-                                    category: RuleCategory::Spelling,
-                                    explanation: format!("Corrected spelling of '{}' to '{}'", word, fixed_word),
-                                });
-                            }
                         }
                     }
                 }
             }
         }
 
-        // 3. Score & filter candidates using statistical language model
-        candidates.sort_by(|a, b| b.confidence.partial_cmp(&a.confidence).unwrap_or(std::cmp::Ordering::Equal));
-        candidates
-    }
+        // 3. Resolve overlapping candidate spans: Keep highest confidence and longest span
+        raw_candidates.sort_by(|a, b| {
+            b.confidence
+                .partial_cmp(&a.confidence)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then_with(|| (b.end_offset - b.start_offset).cmp(&(a.end_offset - a.start_offset)))
+        });
 
-    /// Produces a full corrected sentence by applying all non-conflicting suggestions
-    pub fn correct_sentence(&self, text: &str) -> (String, Vec<GrammarSuggestionCandidate>) {
-        let suggestions = self.infer(text);
-        if suggestions.is_empty() {
-            return (text.to_string(), Vec::new());
-        }
+        let mut filtered_candidates: Vec<GrammarSuggestionCandidate> = Vec::new();
+        for cand in raw_candidates {
+            let overlaps = filtered_candidates.iter().any(|existing| {
+                !(cand.end_offset <= existing.start_offset || cand.start_offset >= existing.end_offset)
+            });
 
-        // Sort by start offset descending so replacements don't invalidate previous offsets
-        let mut sorted = suggestions.clone();
-        sorted.sort_by(|a, b| b.start_offset.cmp(&a.start_offset));
-
-        let mut corrected = text.to_string();
-        let mut applied = Vec::new();
-        let mut last_start = usize::MAX;
-
-        for s in sorted {
-            if s.end_offset <= last_start {
-                if s.start_offset < corrected.len() && s.end_offset <= corrected.len() {
-                    corrected.replace_range(s.start_offset..s.end_offset, &s.corrected_text);
-                    last_start = s.start_offset;
-                    applied.push(s);
-                }
+            if !overlaps {
+                filtered_candidates.push(cand);
             }
         }
 
-        applied.reverse();
-        (corrected, applied)
+        filtered_candidates.sort_by_key(|c| c.start_offset);
+        filtered_candidates
+    }
+
+    /// Produces a full corrected sentence by applying all non-conflicting suggestions in multi-pass
+    pub fn correct_sentence(&self, text: &str) -> (String, Vec<GrammarSuggestionCandidate>) {
+        let mut current_text = text.to_string();
+        let mut all_applied = Vec::new();
+
+        // Perform up to 2 passes to resolve cascading rules
+        for _ in 0..2 {
+            let suggestions = self.infer(&current_text);
+            if suggestions.is_empty() {
+                break;
+            }
+
+            let mut sorted = suggestions;
+            sorted.sort_by(|a, b| b.start_offset.cmp(&a.start_offset));
+
+            let mut pass_changed = false;
+            let mut last_start = usize::MAX;
+
+            for s in sorted {
+                if s.end_offset <= last_start {
+                    if s.start_offset < current_text.len() && s.end_offset <= current_text.len() {
+                        current_text.replace_range(s.start_offset..s.end_offset, &s.corrected_text);
+                        last_start = s.start_offset;
+                        all_applied.push(s);
+                        pass_changed = true;
+                    }
+                }
+            }
+
+            if !pass_changed {
+                break;
+            }
+        }
+
+        (current_text, all_applied)
     }
 }
 
