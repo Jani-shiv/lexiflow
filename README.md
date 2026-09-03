@@ -15,8 +15,9 @@
 <br/>
 
 [**Quick Start**](#quick-start) •
+[**Architectural Comparison**](#architectural-comparison) •
 [**Benchmark Analysis**](#benchmark-analysis) •
-[**Architecture**](#architecture) •
+[**System Architecture**](#system-architecture) •
 [**Core Capabilities**](#core-capabilities) •
 [**Configuration**](#configuration) •
 [**Documentation**](#documentation)
@@ -39,7 +40,7 @@ Built for mission-critical security and high-efficiency computing, LexiFlow exec
 
 ```text
   Input Stream:  "I am go office and saw an car ."
-  Correction:    [Tab] ➔ "I am going to the office and saw a car."  (Latency: 42 µs | 0.042 ms)
+  Correction:    [Tab] -> "I am going to the office and saw a car."  (Latency: 42 µs | 0.042 ms)
 ```
 
 <br/>
@@ -48,15 +49,15 @@ Built for mission-critical security and high-efficiency computing, LexiFlow exec
 
 ## Architectural Comparison
 
-| Dimension | LexiFlow | Cloud NLP APIs (Grammarly, Copilot) | Large Local Models (Ollama, LM Studio) |
-| :--- | :---: | :---: | :---: |
-| **Data Privacy** | 🔒 **100% Air-Gapped (No Sockets)** | ❌ Remote Data Transmission | 🔒 Local Execution |
-| **Process Memory (RSS)** | ⚡ **12.16 MB Peak** | ⚠️ 200 MB – 600 MB (Web Extensions) | ❌ 4.0 GB – 16.0 GB VRAM/RAM |
-| **Inference Latency** | ⚡ **42.03 µs (0.042 ms)** | ⚠️ 250 ms – 1,200 ms (Network Dependent) | ⚠️ 150 ms – 800 ms (Hardware Bound) |
-| **OS-Wide Coverage** | 🌐 **Native OS Kernel/Hook Level** | ⚠️ Limited to Browser / Webviews | ❌ CLI / Isolated Chat Windows |
-| **Credential Exclusion** | 🛡️ **Automated Vault Exclusions** | ⚠️ Varies by integration | ❌ Not Context-Aware |
-| **Clipboard Integrity** | 📋 **Atomic Backup & Restore** | ⚠️ Destructive Paste Risks | ❌ N/A |
-| **CPU / Power Draw** | 🔋 **< 0.1% Idle Load** | ⚠️ Continuous Network Polling | ❌ Heavy GPU Thermal Load |
+| Architectural Dimension | LexiFlow Engine | Cloud NLP APIs (Grammarly, Copilot) | Large Local Models (Ollama, LM Studio) |
+| :--- | :--- | :--- | :--- |
+| **Data Privacy** | **100% Air-Gapped (Zero Sockets)** | Remote Socket Transmission | Local Execution |
+| **Process Memory (RSS)** | **12.16 MB Peak Load** | 200 MB – 600 MB (Web Extensions) | 4.0 GB – 16.0 GB VRAM/RAM |
+| **Inference Latency** | **42.03 µs (0.042 ms)** | 250 ms – 1,200 ms (Network Dependent) | 150 ms – 800 ms (Compute Bound) |
+| **System-Wide Coverage** | **Native OS Kernel Hook (All Apps)** | Limited to Browser WebViews | Isolated CLI / Chat Window |
+| **Credential Exclusion** | **Automatic Vault Exclusions** | Integration Dependent | Not Context-Aware |
+| **Clipboard Integrity** | **Atomic Backup & Restore** | Direct Clipboard Overwrite | Not Applicable |
+| **CPU / Power Consumption** | **< 0.1% Idle Load** | Continuous Polling | Heavy Thermal / GPU Load |
 
 <br/>
 
@@ -68,15 +69,15 @@ Built for mission-critical security and high-efficiency computing, LexiFlow exec
 <tr>
 <td width="50%">
 
-### 🔒 Air-Gapped Privacy & Security
+### Air-Gapped Privacy & Security
 - Zero network socket allocations; zero external dependencies.
 - Keystrokes are processed strictly in volatile memory and never written to disk.
-- Fully compliant with air-gapped workstations and strict enterprise security policies.
+- Fully compliant with air-gapped workstations and enterprise security standards.
 
 </td>
 <td width="50%">
 
-### ⚡ Sub-Millisecond Inference
+### Sub-Millisecond Inference
 - Native compiled binary leveraging deterministic DFA pattern matchers.
 - Mean single-sentence analysis completed in **42.03 microseconds**.
 - Instant daemon cold start in **~43.8 ms** with deterministic memory allocation.
@@ -86,7 +87,7 @@ Built for mission-critical security and high-efficiency computing, LexiFlow exec
 <tr>
 <td width="50%">
 
-### 🛡️ Credential & Vault Isolation
+### Credential & Vault Isolation
 - Proactive exclusion of password fields, PIN entries, and secure OS prompts.
 - Built-in process blocklists for password vaults (`1Password`, `Bitwarden`, `KeePass`, `LastPass`).
 - Dynamic memory purging upon context switch to sensitive processes.
@@ -94,7 +95,7 @@ Built for mission-critical security and high-efficiency computing, LexiFlow exec
 </td>
 <td width="50%">
 
-### 🔀 Monotonic Concurrency Safety
+### Monotonic Concurrency Safety
 - Monotonic atomic `request_id` versioning prevents asynchronous race conditions.
 - Typing during in-flight evaluation instantly invalidates stale inference results.
 - RAII-managed `InjectionGuard` tokens eliminate recursive feedback loops.
@@ -104,7 +105,7 @@ Built for mission-critical security and high-efficiency computing, LexiFlow exec
 <tr>
 <td width="50%">
 
-### 📋 Atomic Diff & Injection
+### Atomic Diff & Text Injection
 - Computes minimal character diffs (common prefix/suffix) to reduce simulated events.
 - Atomic clipboard snapshot captured before dispatch and restored immediately.
 - Hotkey interface: **`Tab`** to commit substitution, **`Esc`** to dismiss.
@@ -112,7 +113,7 @@ Built for mission-critical security and high-efficiency computing, LexiFlow exec
 </td>
 <td width="50%">
 
-### 📈 Hybrid Linguistic Pipeline
+### Hybrid Linguistic Pipeline
 - **Deterministic Rules**: High-precision evaluation for subject-verb agreement and prepositions.
 - **Lexical Dictionary**: High-frequency typo correction with Levenshtein distance metrics.
 - **Statistical N-Gram Model**: Bigram language scoring model occupying < 5 MB RAM.
@@ -150,7 +151,7 @@ Comprehensive benchmark metrics collected via genuine OS Resident Set Size (`sys
 
 ---
 
-## Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
@@ -229,6 +230,12 @@ cargo build --release
 ```bash
 # Start the background suggestion daemon
 .\target\release\lexiflow.exe --daemon
+
+# Quick sentence check via CLI
+.\target\release\lexiflow.exe --check "I am go office and saw an car."
+
+# Interactive CLI testing session
+.\target\release\lexiflow.exe --interactive
 
 # Execute OS memory and microsecond latency benchmarks
 .\target\release\lexiflow.exe --benchmark
