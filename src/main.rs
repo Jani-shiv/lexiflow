@@ -9,6 +9,7 @@ use lexiflow::security::SecurityFilter;
 use lexiflow::sentence_detection::SentenceSegmenter;
 use lexiflow::suggestion::SuggestionManager;
 use lexiflow::text_context::TextContextBuffer;
+use std::io::{self, BufRead, Write};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -17,12 +18,14 @@ fn print_help() {
     println!("Usage:");
     println!("  lexiflow [OPTIONS]\n");
     println!("Options:");
-    println!("  --daemon           Run as background suggestion daemon (default)");
-    println!("  --benchmark        Execute comprehensive Memory RSS and Latency benchmarks");
-    println!("  --verify-offline   Verify offline execution and zero-network isolation");
-    println!("  --autostart <cmd>  Configure startup ('enable', 'disable', 'status')");
-    println!("  --check-config     Validate and inspect configuration");
-    println!("  --help, -h         Show this help message\n");
+    println!("  --daemon                  Run as background suggestion daemon (default)");
+    println!("  --interactive, -i         Interactive CLI mode to test sentences live");
+    println!("  --check <text>            Check and correct a single sentence directly");
+    println!("  --benchmark               Execute comprehensive Memory RSS and Latency benchmarks");
+    println!("  --verify-offline          Verify offline execution and zero-network isolation");
+    println!("  --autostart <cmd>         Configure startup ('enable', 'disable', 'status')");
+    println!("  --check-config            Validate and inspect configuration");
+    println!("  --help, -h                Show this help message\n");
 }
 
 fn main() {
@@ -34,7 +37,70 @@ fn main() {
         return;
     }
 
-    // 2. Validate configuration flag
+    // 2. Direct sentence check
+    if let Some(pos) = args.iter().position(|a| a == "--check" || a == "-c") {
+        let sentence = args.get(pos + 1).map(|s| s.as_str()).unwrap_or("I am go office.");
+        let engine = GrammarEngine::new();
+        let start = Instant::now();
+        let (corrected, matches) = engine.correct_sentence(sentence);
+        let elapsed = start.elapsed();
+
+        println!("=======================================================");
+        println!("  LEXIFLOW INSTANT GRAMMAR CHECK");
+        println!("=======================================================");
+        println!("Original:   {}", sentence);
+        println!("Corrected:  {}", corrected);
+        println!("Latency:    {:.2} µs ({:.4} ms)", elapsed.as_micros(), elapsed.as_secs_f64() * 1000.0);
+        println!("Matches:    {} rule(s) triggered", matches.len());
+        for (i, m) in matches.iter().enumerate() {
+            println!("  [{}] {}: '{}' -> '{}' ({})", i + 1, m.category.as_str(), m.original_text, m.corrected_text, m.explanation);
+        }
+        println!("=======================================================\n");
+        return;
+    }
+
+    // 3. Interactive CLI Mode
+    if args.iter().any(|a| a == "--interactive" || a == "-i") {
+        println!("=======================================================");
+        println!("  LEXIFLOW INTERACTIVE TEST MODE");
+        println!("  Type any sentence and press Enter to see corrections.");
+        println!("  Type 'exit' or 'quit' to exit.");
+        println!("=======================================================\n");
+
+        let engine = GrammarEngine::new();
+        let stdin = io::stdin();
+        let mut handle = stdin.lock();
+
+        loop {
+            print!("lexiflow> ");
+            io::stdout().flush().unwrap();
+            let mut line = String::new();
+            if handle.read_line(&mut line).unwrap_or(0) == 0 {
+                break;
+            }
+            let trimmed = line.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+            if trimmed.eq_ignore_ascii_case("exit") || trimmed.eq_ignore_ascii_case("quit") {
+                break;
+            }
+
+            let start = Instant::now();
+            let (corrected, matches) = engine.correct_sentence(trimmed);
+            let elapsed = start.elapsed();
+
+            println!("  ➔ Corrected: {}", corrected);
+            println!("    (Evaluated in {:.2} µs | {} rule matches)", elapsed.as_micros(), matches.len());
+            for m in &matches {
+                println!("    • [{}] {}: '{}' -> '{}'", m.category.as_str(), m.explanation, m.original_text, m.corrected_text);
+            }
+            println!();
+        }
+        return;
+    }
+
+    // 4. Validate configuration flag
     if args.iter().any(|a| a == "--check-config") {
         let path = AppConfig::default_config_path();
         let config = AppConfig::load_or_default(&path);
@@ -42,7 +108,7 @@ fn main() {
         return;
     }
 
-    // 3. Autostart management
+    // 5. Autostart management
     if let Some(pos) = args.iter().position(|a| a == "--autostart") {
         let sub_cmd = args.get(pos + 1).map(|s| s.as_str()).unwrap_or("status");
         match sub_cmd {
@@ -63,7 +129,7 @@ fn main() {
         return;
     }
 
-    // 4. Verification and Offline Test
+    // 6. Verification and Offline Test
     if args.iter().any(|a| a == "--verify-offline") {
         println!("Verifying complete local-only / zero-network isolation...");
         let engine = GrammarEngine::new();
@@ -74,7 +140,7 @@ fn main() {
         return;
     }
 
-    // 5. System Benchmark Mode
+    // 7. System Benchmark Mode
     if args.iter().any(|a| a == "--benchmark") {
         println!("=======================================================");
         println!("  LEXIFLOW SYSTEM BENCHMARKS");
@@ -99,7 +165,7 @@ fn main() {
         return;
     }
 
-    // 6. Default: Background Daemon Mode
+    // 8. Default: Background Daemon Mode
     init_logger("info");
     log_info("daemon_start", &[("status", "running")]);
 
