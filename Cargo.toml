@@ -1,0 +1,34 @@
+[package]
+name = "lexiflow"
+version = "0.1.0"
+edition = "2021"
+authors = ["Shiv Jani <153932136+Jani-shiv@users.noreply.github.com>"]
+description = "Ultra-Fast, Offline, System-Wide Grammar & Writing Assistant Engine in Rust (<15MB RSS)"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Jani-shiv/lexiflow"
+readme = "README.md"
+keywords = ["grammar", "spellcheck", "nlp", "offline", "productivity"]
+categories = ["command-line-utilities", "text-processing"]
+
+[lib]
+name = "lexiflow"
+path = "src/lib.rs"
+
+[[bin]]
+name = "lexiflow"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+sysinfo = "0.30"
+unicode-segmentation = "1.10"
+regex = "1.10"
+strsim = "0.11"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
