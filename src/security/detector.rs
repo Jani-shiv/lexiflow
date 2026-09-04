@@ -70,13 +70,14 @@ impl SecurityFilter {
 
     /// Checks if a process name is in the secure exclusion blocklist
     pub fn is_process_excluded(&self, process_name: &str) -> bool {
-        let cleaned = process_name.to_lowercase();
-        let file_name = std::path::Path::new(&cleaned)
+        let normalized = process_name.to_lowercase().replace('\\', "/");
+        let file_name = std::path::Path::new(&normalized)
             .file_name()
             .and_then(|f| f.to_str())
-            .unwrap_or(&cleaned);
+            .unwrap_or(&normalized);
 
-        self.excluded_processes.contains(file_name) || self.excluded_processes.contains(&cleaned)
+        self.excluded_processes.contains(file_name)
+            || self.excluded_processes.contains(&normalized)
     }
 
     /// Checks if a window title indicates an authentication / sensitive dialog
